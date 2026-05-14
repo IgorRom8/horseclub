@@ -15,9 +15,9 @@ const galleryImages = {
 
   stables: [siteImages.servicePostoy, cmsStockImages.denniki, galleryStockImages.stable3],
 
-  arenas: [siteImages.serviceTrain, cmsStockImages.manezh, galleryStockImages.arena3],
+  arenas: [cmsStockImages.manezh, cmsStockImages.plac, siteImages.serviceFeed],
 
-  paddocks: [siteImages.hero, siteImages.infrastructureAside, cmsStockImages.levada],
+  paddocks: [cmsStockImages.levada, siteImages.hero, siteImages.infrastructureAside],
 
 } as const;
 

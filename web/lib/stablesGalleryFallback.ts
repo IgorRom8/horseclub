@@ -1,11 +1,15 @@
 import type { GalleryDto } from "@/lib/cms";
 import { cmsStockImages, galleryStockImages, siteImages } from "@/lib/siteImages";
 
-/** Те же слоты, что в `prisma/seed.ts` → `galleryImages` (без БД страница «Конюшни» всё равно показывает галерею). */
+/**
+ * Те же слоты, что в `prisma/seed.ts` → `galleryImages`.
+ * Не используем подряд service-train + cms-manezh + gallery-arena-3: в `images:sync` все три
+ * часто копируются из одного `manej.jpg` — на странице получались три одинаковых кадра.
+ */
 const galleryImages = {
   stables: [siteImages.servicePostoy, cmsStockImages.denniki, galleryStockImages.stable3],
-  arenas: [siteImages.serviceTrain, cmsStockImages.manezh, galleryStockImages.arena3],
-  paddocks: [siteImages.hero, siteImages.infrastructureAside, cmsStockImages.levada],
+  arenas: [cmsStockImages.manezh, cmsStockImages.plac, siteImages.serviceFeed],
+  paddocks: [cmsStockImages.levada, siteImages.hero, siteImages.infrastructureAside],
 } as const;
 
 export function getStaticKonyushniGallery(): GalleryDto[] {
