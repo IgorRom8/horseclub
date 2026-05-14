@@ -35,7 +35,7 @@ export default async function StablesGalleryPage() {
       <h1 className="font-serif text-4xl text-accent">Конюшни</h1>
       <p className="mt-3 max-w-2xl text-neutral-700">
         Три снимка об устройстве постоя: денники, проходы и удобство повседневной работы с лошадьми.
-        Нажмите фото — откроется просмотр крупным планом.
+        Нажмите карточку — откроется окно с фото и текстом.
       </p>
 
       <StablesGalleryCards items={items} className="mt-10" />

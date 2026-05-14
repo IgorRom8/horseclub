@@ -365,9 +365,12 @@ async function main() {
 
   const stablesGalleryTitles = ["Постой и денники", "Обустройство конюшни", "Ряд у выхода"];
 
+  const stablesGallerySlots = [0, 1, 3] as const;
+
   for (let i = 0; i < 3; i++) {
 
-    const src = konyushniGalleryImages[i];
+    const slot = stablesGallerySlots[i];
+    const src = konyushniGalleryImages[slot];
 
     if (!src) throw new Error("konyushniGalleryImages: нужны три файла для сида конюшни");
 

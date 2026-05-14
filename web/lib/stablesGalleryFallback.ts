@@ -20,7 +20,17 @@ export function uniqueGalleryByImageUrl<T extends { imageUrl: string }>(items: T
   });
 }
 
-/** Тексты карточек конюшни (изображения — первые три слота `konyushniGalleryImages`). */
+/** Пути к фото карточек конюшни (третья — другой кадр, не gallery-kon-03). */
+const STABLES_CARD_IMAGE_INDICES = [0, 1, 3] as const;
+
+function stablesCardImageAt(cardIndex: number): string {
+  const slot = STABLES_CARD_IMAGE_INDICES[cardIndex];
+  if (slot === undefined) throw new Error("stables: нет слота изображения");
+  const src = konyushniGalleryImages[slot];
+  if (!src) throw new Error("konyushniGalleryImages: не хватает файла для карточки конюшни");
+  return src;
+}
+
 const STABLES_INTRO = [
   {
     key: "stoyanka",
@@ -44,8 +54,7 @@ const STABLES_INTRO = [
 
 export function getStaticStablesGalleryCards(): StablesGalleryCard[] {
   return STABLES_INTRO.map((row, i) => {
-    const src = konyushniGalleryImages[i];
-    if (!src) throw new Error("konyushniGalleryImages: нужны минимум 3 файла для конюшни");
+    const src = stablesCardImageAt(i);
     return {
       id: `static-${row.key}`,
       title: row.title,
