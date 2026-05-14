@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   Json
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryImage {
+  id           String @id @default(cuid())
+  imageUrl     String
+  thumbnailUrl String
+  title        String
+  page         String
+  order        Int    @default(0)
+}
+
+model ContactRequest {
+  id            String    @id @default(cuid())
+  name          String
+  phone         String
+  message       String?
+  serviceSlug   String?
+  preferredDate DateTime?
+  createdAt     DateTime  @default(now())
+  status        String    @default("new")
+}

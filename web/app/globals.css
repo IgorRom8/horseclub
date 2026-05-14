@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #fffcf7;
+  --sand: #f5f0e6;
+  --accent: #7d6b52;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .motion-safe\:transition-all {
+      transition: none !important;
+    }
+
+    .motion-safe\:opacity-100,
+    .motion-safe\:opacity-0 {
+      opacity: 1 !important;
+    }
+
+    .motion-safe\:translate-y-0,
+    .motion-safe\:translate-y-7 {
+      transform: none !important;
+    }
+  }
+
+  body {
+    @apply bg-[var(--bg)] bg-gradient-to-br from-[#fffcf8] via-white to-[#f8f3ec] font-sans text-ink antialiased;
+  }
+}
+
+@layer utilities {
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animate-delay-450 {
+    animation-delay: 450ms;
+  }
+  .animate-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-fade-in,
+    .animate-hero-reveal,
+    .animate-hero-pan,
+    .animate-line-grow {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+}

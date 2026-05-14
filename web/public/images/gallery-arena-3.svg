@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+
+  <defs>
+
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+
+      <stop offset="0%" stop-color="#faf7f2"/>
+
+      <stop offset="50%" stop-color="#ebe4d8"/>
+
+      <stop offset="100%" stop-color="#ddd5c8"/>
+
+    </linearGradient>
+
+  </defs>
+
+  <rect fill="url(#bg)" width="100%" height="100%"/>
+
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#5c4d3a" font-family="Georgia,serif" font-size="33">Манеж · вид 3</text>
+
+  
+
+</svg>
