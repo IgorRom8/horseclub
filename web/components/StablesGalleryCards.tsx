@@ -108,16 +108,21 @@ export function StablesGalleryCards({ items, className }: Props) {
                 />
               </div>
             </div>
-            <div className="max-h-[40vh] overflow-y-auto px-5 pb-6 pt-5 sm:max-h-none sm:px-7 sm:pb-7">
+            <div className="max-h-[min(52vh,420px)] overflow-y-auto px-5 pb-6 pt-5 sm:max-h-[min(60vh,520px)] sm:px-7 sm:pb-7">
               <h2
                 id="stables-modal-title"
                 className="pr-10 font-serif text-2xl leading-tight text-accent sm:text-3xl"
               >
                 {active.title}
               </h2>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-700 sm:text-base">
+              <p className="mt-4 text-sm font-medium leading-relaxed text-ink/90 sm:text-base">
                 {active.description}
               </p>
+              <div className="mt-5 space-y-4 border-t border-sand pt-5 text-sm leading-relaxed text-neutral-700 sm:text-base">
+                {active.detail.split("\n\n").map((block, i) => (
+                  <p key={i}>{block}</p>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={close}
