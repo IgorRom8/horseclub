@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/prisma-client";
 import { cmsStockImages, galleryStockImages, siteImages } from "./siteImageUrls.mjs";
 
 

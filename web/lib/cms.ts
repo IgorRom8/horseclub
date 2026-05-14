@@ -1,4 +1,4 @@
-import type { GalleryImage as GalleryRow, Page } from "@prisma/client";
+import type { GalleryImage as GalleryRow, Page } from "@/generated/prisma-client";
 import { prisma } from "@/lib/prisma";
 
 export type CmsPageRecord = {
