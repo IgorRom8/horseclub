@@ -203,7 +203,7 @@ export function LeadForm({
                   Заявка отправлена
                 </h2>
                 <p id="lead-success-desc" className="mt-3 text-sm leading-relaxed text-neutral-700">
-                  Наш менеджер скоро с вами свяжется.
+                  Вам скоро перезвонит менеджер.
                 </p>
                 <button
                   type="button"
