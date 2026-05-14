@@ -44,7 +44,8 @@ async function main() {
     framework: "nextjs",
     outputDirectory: null,
     /** Как в web/vercel.json — lockfile в корне монорепо */
-    installCommand: "cd .. && (npm ci || npm install)",
+    installCommand:
+      'if [ "$(basename "$PWD")" = "web" ] && [ -f ../package.json ]; then cd .. && (npm ci || npm install); else (npm ci || npm install); fi',
     /** По умолчанию из package.json пакета web через vercel.json */
     buildCommand: null,
     /** Для workspace / установки из родительской папки */
