@@ -33,3 +33,14 @@ export function getStaticKonyushniGallery(): GalleryDto[] {
 
   return out;
 }
+
+/** Убирает карточки с тем же `imageUrl` (порядок сохраняется, дубликаты после первого отбрасываются). */
+export function uniqueGalleryByImageUrl<T extends { imageUrl: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.imageUrl.trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}

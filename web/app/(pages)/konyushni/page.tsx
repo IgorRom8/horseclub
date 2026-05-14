@@ -4,7 +4,7 @@ import { GalleryGrid } from "@/components/GalleryGrid";
 import { ManagerContactBlock } from "@/components/ManagerContactBlock";
 import type { GalleryDto } from "@/lib/cms";
 import { getGalleryByCategory } from "@/lib/cms";
-import { getStaticKonyushniGallery } from "@/lib/stablesGalleryFallback";
+import { getStaticKonyushniGallery, uniqueGalleryByImageUrl } from "@/lib/stablesGalleryFallback";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ async function loadGallery(): Promise<Img[]> {
 }
 
 export default async function StablesGalleryPage() {
-  const items = await loadGallery();
+  const items = uniqueGalleryByImageUrl(await loadGallery());
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
