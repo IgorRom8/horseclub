@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { FadeIn } from "@/components/FadeIn";
 import { ManagerContactBlock } from "@/components/ManagerContactBlock";
 import { StablesGalleryCards } from "@/components/StablesGalleryCards";
 import { getGalleryByCategory } from "@/lib/cms";
@@ -32,15 +33,19 @@ export default async function StablesGalleryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <h1 className="font-serif text-4xl text-accent">Конюшни</h1>
-      <p className="mt-3 max-w-2xl text-neutral-700">
-        Три снимка об устройстве постоя: денники, проходы и удобство повседневной работы с лошадьми.
-        Нажмите карточку — откроется окно с фото и текстом.
-      </p>
+      <FadeIn>
+        <h1 className="font-serif text-4xl text-accent">Конюшни</h1>
+        <p className="mt-3 max-w-2xl text-neutral-700">
+          Три снимка об устройстве постоя: денники, проходы и удобство повседневной работы с лошадьми.
+          Нажмите карточку — откроется окно с фото и текстом.
+        </p>
+      </FadeIn>
 
       <StablesGalleryCards items={items} className="mt-10" />
 
-      <ManagerContactBlock className="mt-16" />
+      <FadeIn className="mt-16">
+        <ManagerContactBlock />
+      </FadeIn>
     </div>
   );
 }

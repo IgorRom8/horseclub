@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { CmsPageContent } from "@/components/CmsPageContent";
+import { FadeIn } from "@/components/FadeIn";
 import type { CmsPageRecord } from "@/lib/cms";
 import { getCmsPageBySlug } from "@/lib/cms";
 import { cmsPageFallbacks } from "@/lib/cmsPageFallbacks";
@@ -54,10 +55,12 @@ export default async function DynamicCmsPage({ params }: { params: Promise<{ slu
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="font-serif text-4xl text-accent">{page.title}</h1>
-      <div className="mt-8">
+      <FadeIn>
+        <h1 className="font-serif text-4xl text-accent">{page.title}</h1>
+      </FadeIn>
+      <FadeIn className="mt-8" delay={100}>
         <CmsPageContent content={page.content} />
-      </div>
+      </FadeIn>
     </div>
   );
 }

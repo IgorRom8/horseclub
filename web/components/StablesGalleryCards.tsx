@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
+import { FadeIn } from "@/components/FadeIn";
 import type { StablesGalleryCard } from "@/lib/stablesGalleryFallback";
 
 type Props = {
@@ -35,39 +36,40 @@ export function StablesGalleryCards({ items, className }: Props) {
     <div className={className}>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {items.map((item, i) => (
-          <article
-            key={item.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => setOpenIndex(i)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setOpenIndex(i);
-              }
-            }}
-            className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-sand bg-white/80 shadow-soft transition duration-300 hover:border-accent/25 hover:shadow-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-          >
-            <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
-              <Image
-                src={item.thumbnailUrl}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 100vw, 33vw"
-                className="object-cover transition duration-500 ease-smooth group-hover:scale-[1.04]"
-                loading="lazy"
-              />
-              <span className="absolute bottom-3 left-3 rounded border border-white/35 bg-black/50 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-white backdrop-blur-[2px]">
-                Подробнее
-              </span>
-            </div>
-            <div className="flex flex-1 flex-col border-t border-sand/90 bg-gradient-to-b from-white/60 to-[#faf7f2]/90 p-5">
-              <h2 className="font-serif text-xl leading-snug text-accent">{item.title}</h2>
-              <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-neutral-700 md:line-clamp-3">
-                {item.description}
-              </p>
-            </div>
-          </article>
+          <FadeIn key={item.id} delay={i * 90}>
+            <article
+              role="button"
+              tabIndex={0}
+              onClick={() => setOpenIndex(i)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpenIndex(i);
+                }
+              }}
+              className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border border-sand bg-white/80 shadow-soft transition duration-300 hover:border-accent/25 hover:shadow-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            >
+              <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
+                <Image
+                  src={item.thumbnailUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover transition duration-500 ease-smooth group-hover:scale-[1.04]"
+                  loading="lazy"
+                />
+                <span className="absolute bottom-3 left-3 rounded border border-white/35 bg-black/50 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-white backdrop-blur-[2px]">
+                  Подробнее
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col border-t border-sand/90 bg-gradient-to-b from-white/60 to-[#faf7f2]/90 p-5">
+                <h2 className="font-serif text-xl leading-snug text-accent">{item.title}</h2>
+                <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-neutral-700 md:line-clamp-3">
+                  {item.description}
+                </p>
+              </div>
+            </article>
+          </FadeIn>
         ))}
       </div>
 
