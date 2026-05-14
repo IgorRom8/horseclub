@@ -1,9 +1,19 @@
+import { randomUUID } from "crypto";
+
 import { Prisma } from "@/generated/prisma-client";
 import { prisma } from "@/lib/prisma";
 
 const allowedSlug = ["postoy", "trenirovki", "kormlenie"] as const;
 
 export type ContactResult = { ok: true; id: string } | { ok: false; status: number; error: string };
+
+type NormalizedContact = {
+  name: string;
+  phone: string;
+  message?: string;
+  serviceSlug?: string;
+  preferredDate?: Date;
+};
 
 function prismaErrorCode(err: unknown): string | undefined {
   if (err instanceof Prisma.PrismaClientKnownRequestError) return err.code;
@@ -19,14 +29,14 @@ function prismaFailureMessage(err: unknown): { status: number; error: string } {
     return {
       status: 503,
       error:
-        "Не удалось инициализировать подключение к базе. Проверьте DATABASE_URL на Vercel (облачный хост PostgreSQL, sslmode, без localhost).",
+        "Не удалось инициализировать подключение к базе. Проверьте DATABASE_URL на Vercel (облачный хост PostgreSQL, sslmode, без localhost). Либо настройте CONTACT_WEBHOOK_URL — заявка уйдёт на вебхук.",
     };
   }
   if (err instanceof Prisma.PrismaClientUnknownRequestError) {
     return {
       status: 503,
       error:
-        "Ошибка запроса к базе данных. Часто это сеть или несовместимость версии Prisma с хостингом. Проверьте логи функции на Vercel и строку подключения.",
+        "Ошибка запроса к базе данных. Проверьте логи на Vercel и строку подключения или настройте CONTACT_WEBHOOK_URL.",
     };
   }
   const code = prismaErrorCode(err);
@@ -38,23 +48,24 @@ function prismaFailureMessage(err: unknown): { status: number; error: string } {
         return {
           status: 503,
           error:
-            "База данных сейчас недоступна. Укажите на Vercel корректный DATABASE_URL (хост в интернете, не localhost) и разрешите внешние подключения у провайдера БД.",
+            "База данных недоступна. Укажите корректный DATABASE_URL или настройте CONTACT_WEBHOOK_URL на Vercel (Discord / Make.com и т.п.).",
         };
       case "P1000":
         return {
           status: 503,
-          error: "Не удалось подключиться к базе: неверный логин или пароль в DATABASE_URL.",
+          error:
+            "Неверный логин или пароль в DATABASE_URL. Или используйте CONTACT_WEBHOOK_URL без базы.",
         };
       case "P2021":
         return {
           status: 503,
           error:
-            "Таблица заявок не найдена. Выполните к вашей облачной БД из каталога web: npx prisma db push",
+            "Таблица заявок не создана: из каталога web выполните npx prisma db push к облачной БД. Либо настройте CONTACT_WEBHOOK_URL.",
         };
       default:
         return {
           status: 503,
-          error: `Ошибка базы (${code}). Проверьте подключение и схему, либо напишите нам по телефону с сайта.`,
+          error: `Ошибка базы (${code}). Проверьте подключение или задайте CONTACT_WEBHOOK_URL.`,
         };
     }
   }
@@ -63,6 +74,53 @@ function prismaFailureMessage(err: unknown): { status: number; error: string } {
     error:
       "Не удалось сохранить заявку. Попробуйте позже или позвоните — контакты указаны на сайте.",
   };
+}
+
+async function notifyContactWebhook(data: NormalizedContact): Promise<boolean> {
+  const url = process.env.CONTACT_WEBHOOK_URL?.trim();
+  if (!url) return false;
+
+  const isDiscord = url.includes("discord.com/api/webhooks");
+  const body: Record<string, unknown> = isDiscord
+    ? {
+        content: [
+          "**Заявка с сайта конного клуба**",
+          `Имя: ${data.name}`,
+          `Телефон: ${data.phone}`,
+          data.message ? `Комментарий: ${data.message}` : null,
+          data.serviceSlug ? `Услуга: ${data.serviceSlug}` : null,
+          data.preferredDate
+            ? `Дата: ${data.preferredDate.toISOString().slice(0, 10)}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      }
+    : {
+        source: "horseclub-contact",
+        name: data.name,
+        phone: data.phone,
+        message: data.message ?? null,
+        serviceSlug: data.serviceSlug ?? null,
+        preferredDate: data.preferredDate?.toISOString() ?? null,
+        submittedAt: new Date().toISOString(),
+      };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(12_000),
+    });
+    if (!res.ok) {
+      console.error("[contact-create] webhook HTTP", res.status, await res.text().catch(() => ""));
+    }
+    return res.ok;
+  } catch (e) {
+    console.error("[contact-create] webhook fetch", e);
+    return false;
+  }
 }
 
 export async function createContactRequest(body: unknown): Promise<ContactResult> {
@@ -76,15 +134,6 @@ export async function createContactRequest(body: unknown): Promise<ContactResult
 }
 
 async function createContactRequestInner(body: unknown): Promise<ContactResult> {
-  if (!process.env.DATABASE_URL?.trim()) {
-    return {
-      ok: false,
-      status: 503,
-      error:
-        "Заявки через сайт не настроены: в окружении нет DATABASE_URL. Добавьте строку подключения к PostgreSQL в настройках проекта на Vercel.",
-    };
-  }
-
   const source = body as {
     name?: string;
     phone?: string;
@@ -131,20 +180,57 @@ async function createContactRequestInner(body: unknown): Promise<ContactResult> 
     return { ok: false, status: 400, error: "Выберите дату записи на услугу" };
   }
 
-  try {
-    const created = await prisma.contactRequest.create({
-      data: {
-        name,
-        phone,
-        message: source.message?.trim() || undefined,
-        serviceSlug,
-        preferredDate,
-      },
-    });
-    return { ok: true, id: created.id };
-  } catch (err) {
-    console.error("[contact-create] prisma.contactRequest.create", err);
-    const { status, error } = prismaFailureMessage(err);
-    return { ok: false, status, error };
+  const normalized: NormalizedContact = {
+    name,
+    phone,
+    message: source.message?.trim() || undefined,
+    serviceSlug,
+    preferredDate,
+  };
+
+  const hasDb = Boolean(process.env.DATABASE_URL?.trim());
+  let dbError: unknown = null;
+
+  if (hasDb) {
+    try {
+      const created = await prisma.contactRequest.create({
+        data: {
+          name: normalized.name,
+          phone: normalized.phone,
+          message: normalized.message,
+          serviceSlug: normalized.serviceSlug,
+          preferredDate: normalized.preferredDate,
+        },
+      });
+      return { ok: true, id: created.id };
+    } catch (err) {
+      dbError = err;
+      console.error("[contact-create] prisma.contactRequest.create", err);
+    }
   }
+
+  const webhookOk = await notifyContactWebhook(normalized);
+  if (webhookOk) {
+    return { ok: true, id: `wh-${randomUUID()}` };
+  }
+
+  if (dbError) {
+    return { ok: false, ...prismaFailureMessage(dbError) };
+  }
+
+  if (!hasDb && !process.env.CONTACT_WEBHOOK_URL?.trim()) {
+    return {
+      ok: false,
+      status: 503,
+      error:
+        "Заявки не настроены: задайте на Vercel DATABASE_URL (PostgreSQL в интернете) или CONTACT_WEBHOOK_URL (URL вебхука, например Discord / Make.com).",
+    };
+  }
+
+  return {
+    ok: false,
+    status: 503,
+    error:
+      "Не удалось отправить заявку: база недоступна, а вебхук не ответил. Проверьте CONTACT_WEBHOOK_URL и что сервис принимает POST JSON.",
+  };
 }
