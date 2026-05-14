@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": ["web"],
   "scripts": {
+    "vercel:apply": "node scripts/apply-vercel-project-settings.mjs",
     "dev": "npm run dev --workspace=web",
     "build": "npm run build --workspace=web",
     "start": "npm run start --workspace=web",
