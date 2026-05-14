@@ -70,9 +70,9 @@ export function LeadForm({
   const submit = useCallback(async () => {
     setErrText("");
     const n = name.trim();
-    const p = phone.trim();
+    const p = phone.replace(/\D/g, "");
     if (!n || !p) {
-      setErrText("Укажите имя и телефон.");
+      setErrText("Укажите имя и телефон (в номере только цифры).");
       setStatus("err");
       return;
     }
@@ -133,10 +133,12 @@ export function LeadForm({
           <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">Телефон</span>
           <input
             type="tel"
+            inputMode="numeric"
             name="phone"
             autoComplete="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 15))}
+            placeholder="Только цифры, например 79991234567"
             className="rounded-xl border border-sand bg-white px-3 py-2 text-sm text-ink shadow-inner outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25"
           />
         </label>

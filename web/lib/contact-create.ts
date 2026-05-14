@@ -5,40 +5,77 @@ const allowedSlug = ["postoy", "trenirovki", "kormlenie"] as const;
 
 export type ContactResult = { ok: true; id: string } | { ok: false; status: number; error: string };
 
+function prismaErrorCode(err: unknown): string | undefined {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) return err.code;
+  if (err && typeof err === "object" && "code" in err) {
+    const c = (err as { code?: unknown }).code;
+    return typeof c === "string" ? c : undefined;
+  }
+  return undefined;
+}
+
 function prismaFailureMessage(err: unknown): { status: number; error: string } {
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    switch (err.code) {
+  if (err instanceof Prisma.PrismaClientInitializationError) {
+    return {
+      status: 503,
+      error:
+        "Не удалось инициализировать подключение к базе. Проверьте DATABASE_URL на Vercel (облачный хост PostgreSQL, sslmode, без localhost).",
+    };
+  }
+  if (err instanceof Prisma.PrismaClientUnknownRequestError) {
+    return {
+      status: 503,
+      error:
+        "Ошибка запроса к базе данных. Часто это сеть или несовместимость версии Prisma с хостингом. Проверьте логи функции на Vercel и строку подключения.",
+    };
+  }
+  const code = prismaErrorCode(err);
+  if (code) {
+    switch (code) {
       case "P1001":
       case "P1002":
       case "P1017":
         return {
           status: 503,
           error:
-            "База данных сейчас недоступна. Проверьте на Vercel переменную DATABASE_URL (хост в интернете, не localhost) и что база принимает подключения.",
+            "База данных сейчас недоступна. Укажите на Vercel корректный DATABASE_URL (хост в интернете, не localhost) и разрешите внешние подключения у провайдера БД.",
         };
       case "P1000":
         return {
           status: 503,
-          error:
-            "Не удалось подключиться к базе: неверный логин или пароль в DATABASE_URL.",
+          error: "Не удалось подключиться к базе: неверный логин или пароль в DATABASE_URL.",
         };
       case "P2021":
         return {
           status: 503,
           error:
-            "Таблицы в базе не созданы. Выполните из каталога web: npx prisma db push (к вашей облачной БД).",
+            "Таблица заявок не найдена. Выполните к вашей облачной БД из каталога web: npx prisma db push",
         };
       default:
-        break;
+        return {
+          status: 503,
+          error: `Ошибка базы (${code}). Проверьте подключение и схему, либо напишите нам по телефону с сайта.`,
+        };
     }
   }
   return {
     status: 500,
-    error: "Не удалось сохранить заявку. Попробуйте позже или позвоните нам — контакты на сайте.",
+    error:
+      "Не удалось сохранить заявку. Попробуйте позже или позвоните — контакты указаны на сайте.",
   };
 }
 
 export async function createContactRequest(body: unknown): Promise<ContactResult> {
+  try {
+    return await createContactRequestInner(body);
+  } catch (err) {
+    console.error("[contact-create] unexpected", err);
+    const { status, error } = prismaFailureMessage(err);
+    return { ok: false, status, error };
+  }
+}
+
+async function createContactRequestInner(body: unknown): Promise<ContactResult> {
   if (!process.env.DATABASE_URL?.trim()) {
     return {
       ok: false,
@@ -56,9 +93,10 @@ export async function createContactRequest(body: unknown): Promise<ContactResult
     preferredDate?: string | null;
   };
   const name = (source.name ?? "").trim();
-  const phone = (source.phone ?? "").trim();
+  const phoneRaw = (source.phone ?? "").trim();
+  const phone = phoneRaw.replace(/\D/g, "");
   if (!name || !phone) {
-    return { ok: false, status: 400, error: "Укажите имя и телефон" };
+    return { ok: false, status: 400, error: "Укажите имя и телефон (только цифры в номере)" };
   }
 
   let serviceSlug: string | undefined;
@@ -93,9 +131,8 @@ export async function createContactRequest(body: unknown): Promise<ContactResult
     return { ok: false, status: 400, error: "Выберите дату записи на услугу" };
   }
 
-  let created;
   try {
-    created = await prisma.contactRequest.create({
+    const created = await prisma.contactRequest.create({
       data: {
         name,
         phone,
@@ -104,10 +141,10 @@ export async function createContactRequest(body: unknown): Promise<ContactResult
         preferredDate,
       },
     });
+    return { ok: true, id: created.id };
   } catch (err) {
     console.error("[contact-create] prisma.contactRequest.create", err);
     const { status, error } = prismaFailureMessage(err);
     return { ok: false, status, error };
   }
-  return { ok: true, id: created.id };
 }

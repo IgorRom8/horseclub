@@ -1,6 +1,9 @@
 import { createContactRequest } from "@/lib/contact-create";
 import { NextResponse } from "next/server";
 
+/** Prisma и @generated/client рассчитаны на Node, не на Edge. */
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   let body: unknown;
   try {
