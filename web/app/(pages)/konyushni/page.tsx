@@ -24,8 +24,8 @@ async function loadGallery(): Promise<Img[]> {
       getGalleryByCategory("arenas"),
       getGalleryByCategory("paddocks"),
     ]);
-    const merged = [...stables, ...arenas, ...paddocks].slice(0, 9);
-    return merged.length ? merged : getStaticKonyushniGallery();
+    const merged = [...stables, ...arenas, ...paddocks];
+    return merged.length ? uniqueGalleryByImageUrl(merged) : getStaticKonyushniGallery();
   } catch {
     return getStaticKonyushniGallery();
   }

@@ -55,6 +55,58 @@ function firstExistingInPool(startIndex) {
   return null;
 }
 
+/** Девять отдельных файлов для страницы «Конюшни»: каждому слоту — свой исходник, без повторов по кругу пула. */
+function copyKonyushniUniqueGallery() {
+  const slots = [
+    ["gallery-kon-01.jpg", "лошад1.jpeg"],
+    ["gallery-kon-02.jpg", "лошад.jpg"],
+    ["gallery-kon-03.jpg", "лошад_тыгыдыг.jpg"],
+    ["gallery-kon-04.jpg", "лошад_тыгыдык2.jpg"],
+    ["gallery-kon-05.jpg", "еще лошади.jpg"],
+    ["gallery-kon-06.jpg", "manej.jpg"],
+    ["gallery-kon-07.jpg", "levad.jpg"],
+    ["gallery-kon-08.webp", "amyn.webp"],
+  ];
+
+  const usedSources = new Set();
+
+  function pickUnusedFromPool() {
+    for (const candidate of FALLBACK_POOL) {
+      if (!fs.existsSync(path.join(SRC_DIR, candidate))) continue;
+      if (usedSources.has(candidate)) continue;
+      return candidate;
+    }
+    return null;
+  }
+
+  function pickAnyFromPool() {
+    for (const candidate of FALLBACK_POOL) {
+      if (fs.existsSync(path.join(SRC_DIR, candidate))) return candidate;
+    }
+    return null;
+  }
+
+  for (const [destName, preferred] of slots) {
+    let srcName =
+      preferred && fs.existsSync(path.join(SRC_DIR, preferred)) ? preferred : null;
+    if (!srcName) srcName = pickUnusedFromPool();
+    if (!srcName) srcName = pickAnyFromPool();
+
+    if (!srcName) {
+      console.warn("Конюшни:", destName, "— нет подходящего исходника, пропуск");
+      continue;
+    }
+
+    if (usedSources.has(srcName)) {
+      console.warn("Конюшни:", destName, "← тот же исходник", srcName, "(в папке images мало разных файлов)");
+    }
+    usedSources.add(srcName);
+
+    fs.copyFileSync(path.join(SRC_DIR, srcName), path.join(OUT_DIR, destName));
+    console.log(`OK ${destName} ← images/${srcName}`);
+  }
+}
+
 function main() {
   if (!fs.existsSync(SRC_DIR)) {
     console.error("Нет папки images в корне проекта:", SRC_DIR);
@@ -87,6 +139,8 @@ function main() {
     fs.copyFileSync(src, dest);
     console.log(`OK ${destName} ← images/${srcName}`);
   }
+
+  copyKonyushniUniqueGallery();
 }
 
 main();

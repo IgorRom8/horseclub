@@ -25,3 +25,15 @@ export const galleryStockImages = {
   stable3: "/images/gallery-stable-3.jpg",
   arena3: "/images/gallery-arena-3.jpg",
 };
+
+/** Как в `web/lib/siteImages.ts` → `konyushniGalleryImages` */
+export const konyushniGalleryImages = [
+  "/images/gallery-kon-01.jpg",
+  "/images/gallery-kon-02.jpg",
+  "/images/gallery-kon-03.jpg",
+  "/images/gallery-kon-04.jpg",
+  "/images/gallery-kon-05.jpg",
+  "/images/gallery-kon-06.jpg",
+  "/images/gallery-kon-07.jpg",
+  "/images/gallery-kon-08.webp",
+];

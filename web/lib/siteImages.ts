@@ -33,3 +33,18 @@ export const galleryStockImages = {
   arena3: "/images/gallery-arena-3.jpg",
 } as const;
 
+/**
+ * Восемь отдельных файлов: в `images:sync` каждому — свой исходник из `kon/images/`.
+ * (Девять разных картинок нельзя, если в `images/` меньше девяти разных файлов.)
+ */
+export const konyushniGalleryImages = [
+  "/images/gallery-kon-01.jpg",
+  "/images/gallery-kon-02.jpg",
+  "/images/gallery-kon-03.jpg",
+  "/images/gallery-kon-04.jpg",
+  "/images/gallery-kon-05.jpg",
+  "/images/gallery-kon-06.jpg",
+  "/images/gallery-kon-07.jpg",
+  "/images/gallery-kon-08.webp",
+] as const;
+

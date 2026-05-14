@@ -1,5 +1,5 @@
 import { PrismaClient } from "../generated/prisma-client";
-import { cmsStockImages, galleryStockImages, siteImages } from "./siteImageUrls.mjs";
+import { cmsStockImages, konyushniGalleryImages } from "./siteImageUrls.mjs";
 
 
 
@@ -10,16 +10,6 @@ const prisma = new PrismaClient();
 /** Те же URL, что экспортирует `web/lib/siteImages.ts` (единый источник). */
 
 const cmsImg = cmsStockImages;
-
-const galleryImages = {
-
-  stables: [siteImages.servicePostoy, cmsStockImages.denniki, galleryStockImages.stable3],
-
-  arenas: [cmsStockImages.manezh, cmsStockImages.plac, siteImages.serviceFeed],
-
-  paddocks: [cmsStockImages.levada, siteImages.hero, siteImages.infrastructureAside],
-
-} as const;
 
 
 
@@ -373,19 +363,25 @@ async function main() {
 
   let order = 0;
 
-  const gallery = ["stables", "arenas", "paddocks"] as const;
+  let urlIdx = 0;
 
-  for (const page of gallery) {
+  const galleryPages = [
+    { page: "stables" as const, count: 3 },
+    { page: "arenas" as const, count: 3 },
+    { page: "paddocks" as const, count: 2 },
+  ];
 
-    const urls = galleryImages[page];
+  for (const { page, count } of galleryPages) {
 
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= count; i++) {
 
       const label =
 
         page === "stables" ? `Конюшни ${i}` : page === "arenas" ? `Манеж ${i}` : `Левада ${i}`;
 
-      const src = urls[i - 1]!;
+      const src = konyushniGalleryImages[urlIdx++];
+
+      if (!src) throw new Error("konyushniGalleryImages: не хватает путей для сида");
 
       await prisma.galleryImage.create({
 
