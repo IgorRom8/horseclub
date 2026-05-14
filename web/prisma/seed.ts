@@ -363,45 +363,31 @@ async function main() {
 
   let order = 0;
 
-  let urlIdx = 0;
+  const stablesGalleryTitles = ["Постой и денники", "Обустройство конюшни", "Ряд у выхода"];
 
-  const galleryPages = [
-    { page: "stables" as const, count: 3 },
-    { page: "arenas" as const, count: 3 },
-    { page: "paddocks" as const, count: 2 },
-  ];
+  for (let i = 0; i < 3; i++) {
 
-  for (const { page, count } of galleryPages) {
+    const src = konyushniGalleryImages[i];
 
-    for (let i = 1; i <= count; i++) {
+    if (!src) throw new Error("konyushniGalleryImages: нужны три файла для сида конюшни");
 
-      const label =
+    await prisma.galleryImage.create({
 
-        page === "stables" ? `Конюшни ${i}` : page === "arenas" ? `Манеж ${i}` : `Левада ${i}`;
+      data: {
 
-      const src = konyushniGalleryImages[urlIdx++];
+        page: "stables",
 
-      if (!src) throw new Error("konyushniGalleryImages: не хватает путей для сида");
+        title: stablesGalleryTitles[i]!,
 
-      await prisma.galleryImage.create({
+        imageUrl: src,
 
-        data: {
+        thumbnailUrl: src,
 
-          page,
+        order: order++,
 
-          title: label,
+      },
 
-          imageUrl: src,
-
-          thumbnailUrl: src,
-
-          order: order++,
-
-        },
-
-      });
-
-    }
+    });
 
   }
 

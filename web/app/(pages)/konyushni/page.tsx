@@ -1,47 +1,44 @@
 export const dynamic = "force-dynamic";
 
-import { GalleryGrid } from "@/components/GalleryGrid";
 import { ManagerContactBlock } from "@/components/ManagerContactBlock";
-import type { GalleryDto } from "@/lib/cms";
+import { StablesGalleryCards } from "@/components/StablesGalleryCards";
 import { getGalleryByCategory } from "@/lib/cms";
-import { getStaticKonyushniGallery, uniqueGalleryByImageUrl } from "@/lib/stablesGalleryFallback";
+import {
+  getStaticStablesGalleryCards,
+  mergeDbStablesGalleryImages,
+} from "@/lib/stablesGalleryFallback";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Конюшни · фотогалерея",
+  title: "Конюшни",
+  description: "Как устроены денники и постой на базе: три ключевых ракурса.",
 };
 
-type Img = Pick<GalleryDto, "id" | "imageUrl" | "thumbnailUrl" | "title">;
-
-async function loadGallery(): Promise<Img[]> {
-  if (!process.env.DATABASE_URL?.trim()) {
-    return getStaticKonyushniGallery();
-  }
+async function loadStablesCards() {
+  const fallback = getStaticStablesGalleryCards();
+  if (!process.env.DATABASE_URL?.trim()) return fallback;
 
   try {
-    const [stables, arenas, paddocks] = await Promise.all([
-      getGalleryByCategory("stables"),
-      getGalleryByCategory("arenas"),
-      getGalleryByCategory("paddocks"),
-    ]);
-    const merged = [...stables, ...arenas, ...paddocks];
-    return merged.length ? uniqueGalleryByImageUrl(merged) : getStaticKonyushniGallery();
+    const stables = await getGalleryByCategory("stables");
+    if (stables.length > 0) return mergeDbStablesGalleryImages(stables, fallback);
   } catch {
-    return getStaticKonyushniGallery();
+    /* БД недоступна — статика */
   }
+  return fallback;
 }
 
 export default async function StablesGalleryPage() {
-  const items = uniqueGalleryByImageUrl(await loadGallery());
+  const items = await loadStablesCards();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="font-serif text-4xl text-accent">Конюшни</h1>
       <p className="mt-3 max-w-2xl text-neutral-700">
-        Фотогалерея: денники, манеж, левады. Клик — полноэкранный просмотр со стрелками.
+        Три снимка об устройстве постоя: денники, проходы и удобство повседневной работы с лошадьми.
+        Нажмите фото — откроется просмотр крупным планом.
       </p>
 
-      <GalleryGrid items={items} className="mt-10" />
+      <StablesGalleryCards items={items} className="mt-10" />
 
       <ManagerContactBlock className="mt-16" />
     </div>
