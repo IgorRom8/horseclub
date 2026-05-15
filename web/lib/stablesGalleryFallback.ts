@@ -34,7 +34,7 @@ function stablesCardImageAt(cardIndex: number): string {
   return src;
 }
 
-const STABLES_INTRO = [
+export const STABLES_INTRO = [
   {
     key: "stoyanka",
     title: "Постой и денники",
@@ -96,6 +96,9 @@ export function mergeDbStablesGalleryImages(
       id: row.id,
       imageUrl: row.imageUrl,
       thumbnailUrl: row.thumbnailUrl,
+      title: row.title?.trim() ? row.title : card.title,
+      description: row.description?.trim() ? row.description : card.description,
+      detail: row.detail?.trim() ? row.detail : card.detail,
     };
   });
 }

@@ -1,4 +1,5 @@
 import { PrismaClient } from "../generated/prisma-client";
+import { STABLES_INTRO } from "../lib/stablesGalleryFallback";
 import { cmsStockImages, konyushniGalleryImages } from "./siteImageUrls.mjs";
 
 
@@ -18,6 +19,8 @@ async function main() {
   await prisma.contactRequest.deleteMany();
 
   await prisma.galleryImage.deleteMany();
+
+  await prisma.siteSetting.deleteMany();
 
   await prisma.page.deleteMany();
 
@@ -363,14 +366,13 @@ async function main() {
 
   let order = 0;
 
-  const stablesGalleryTitles = ["Постой и денники", "Обустройство конюшни", "Ряд у выхода"];
-
   const stablesGallerySlots = [0, 1, 3] as const;
 
   for (let i = 0; i < 3; i++) {
 
     const slot = stablesGallerySlots[i];
     const src = konyushniGalleryImages[slot];
+    const intro = STABLES_INTRO[i]!;
 
     if (!src) throw new Error("konyushniGalleryImages: нужны три файла для сида конюшни");
 
@@ -380,11 +382,15 @@ async function main() {
 
         page: "stables",
 
-        title: stablesGalleryTitles[i]!,
+        title: intro.title,
 
         imageUrl: src,
 
         thumbnailUrl: src,
+
+        description: intro.description,
+
+        detail: intro.detail,
 
         order: order++,
 

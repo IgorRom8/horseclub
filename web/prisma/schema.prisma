@@ -17,12 +17,20 @@ model Page {
 }
 
 model GalleryImage {
-  id           String @id @default(cuid())
+  id           String  @id @default(cuid())
   imageUrl     String
   thumbnailUrl String
   title        String
   page         String
-  order        Int    @default(0)
+  order        Int     @default(0)
+  description  String?
+  detail       String? @db.Text
+}
+
+/** Ключ–значение: site_images и home_texts (JSON) для главной */
+model SiteSetting {
+  key   String @id
+  value String @db.Text
 }
 
 model ContactRequest {

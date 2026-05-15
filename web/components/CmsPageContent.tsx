@@ -1,19 +1,8 @@
 import { RegularImageBlock } from "@/components/RegularImageBlock";
-
-type Block =
-  | { kind: "intro"; text: string }
-  | {
-      kind: "section";
-      title: string;
-      body: string[];
-      image?: { src: string; caption?: string };
-    }
-  | { kind: "rulesSection"; title: string; items: string[] };
-
-type PageContent = { blocks?: Block[] };
+import type { CmsPageContentShape } from "@/lib/cmsPageBlocks";
 
 export function CmsPageContent({ content }: { content: unknown }) {
-  const c = content as PageContent;
+  const c = content as CmsPageContentShape;
   const blocks = c.blocks ?? [];
 
   return (
