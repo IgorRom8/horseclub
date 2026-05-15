@@ -10,8 +10,8 @@ export default async function AdminPrivateLayout({ children }: { children: React
     <div className="min-h-screen bg-gradient-to-b from-[#faf8f5] to-sand/30">
       {open ? (
         <div className="border-b border-amber-200/90 bg-amber-50 px-4 py-2.5 text-center text-xs leading-relaxed text-amber-950">
-          Панель открыта для всех (сайт не в продакшене). Перед запуском в прод защитите:{" "}
-          <code className="rounded bg-white/90 px-1 py-0.5">ADMIN_OPEN_ACCESS=false</code> и вход по паролю.
+          Панель по умолчанию без пароля (в т.ч. на Vercel). Перед продакшеном защитите:{" "}
+          <code className="rounded bg-white/90 px-1 py-0.5">ADMIN_OPEN_ACCESS=false</code> и переменные ADMIN_*.
         </div>
       ) : null}
       <header className="sticky top-0 z-10 border-b border-sand/90 bg-white/95 backdrop-blur-sm">

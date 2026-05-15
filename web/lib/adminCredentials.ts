@@ -4,16 +4,15 @@
  */
 
 /**
- * Открытый доступ к `/admin` без логина (удобно до продакшена).
- * - `development`: по умолчанию открыто.
- * - `production`: открыто только при ADMIN_OPEN_ACCESS=true.
- * - Принудительно закрыть везде: ADMIN_OPEN_ACCESS=false
+ * Открытый доступ к `/admin` без логина.
+ *
+ * По умолчанию **везде открыто** (localhost и Vercel), пока явно не задать
+ * `ADMIN_OPEN_ACCESS=false` и тогда включится вход по паролю + cookie.
  */
 export function isAdminOpenAccess(): boolean {
   const v = process.env.ADMIN_OPEN_ACCESS?.trim().toLowerCase();
-  if (v === "false" || v === "0") return false;
-  if (v === "true" || v === "1") return true;
-  return process.env.NODE_ENV !== "production";
+  if (v === "false" || v === "0" || v === "no") return false;
+  return true;
 }
 
 export function getAdminUsername(): string {
