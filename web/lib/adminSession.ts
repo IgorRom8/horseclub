@@ -43,7 +43,10 @@ export async function verifyAdminSessionToken(token: string | undefined, secret:
     const payloadBytes = b64urlToU8(parts[0]!);
     const sig = b64urlToU8(parts[1]!);
     const key = await getHmacKey(secret);
-    const ok = await crypto.subtle.verify("HMAC", key, sig, payloadBytes);
+    /** Копии для совместимости типов SubtleCrypto с `strict` TS (BufferSource) */
+    const data = new Uint8Array(payloadBytes);
+    const signature = new Uint8Array(sig);
+    const ok = await crypto.subtle.verify("HMAC", key, signature, data);
     if (!ok) return false;
     const payload = JSON.parse(new TextDecoder().decode(payloadBytes)) as { exp: number; v?: number };
     return typeof payload.exp === "number" && payload.exp > Date.now();
