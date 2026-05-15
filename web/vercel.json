@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "if [ \"$(basename \"$PWD\")\" = \"web\" ] && [ -f ../package.json ]; then cd .. && (npm ci || npm install); else (npm ci || npm install); fi",
+  "installCommand": "if [ -f ../package-lock.json ]; then cd .. && (npm ci || npm install); elif [ -f package-lock.json ]; then (npm ci || npm install); else npm install; fi",
   "buildCommand": "npm run build"
 }
