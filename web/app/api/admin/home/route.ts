@@ -7,7 +7,7 @@ import {
   type HomeTexts,
   type ResolvedSiteImages,
 } from "@/lib/homePageSettings";
-import { prismaMissingTableUserHint } from "@/lib/prismaDbHelp";
+import { prismaUserFacingHttpError } from "@/lib/prismaDbHelp";
 import { prisma } from "@/lib/prisma";
 import { siteImages } from "@/lib/siteImages";
 
@@ -57,10 +57,8 @@ export async function POST(req: Request) {
       });
     }
   } catch (e) {
-    const hint = prismaMissingTableUserHint(e);
-    if (hint) {
-      return NextResponse.json({ error: hint }, { status: 503 });
-    }
+    const facing = prismaUserFacingHttpError(e);
+    if (facing) return NextResponse.json({ error: facing.error }, { status: facing.status });
     console.error(e);
     return NextResponse.json({ error: "Ошибка записи в БД" }, { status: 500 });
   }

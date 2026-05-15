@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { assertAdmin } from "@/lib/adminApiAuth";
 import { isAdminEditableSlug } from "@/lib/adminEditablePages";
 import { prisma } from "@/lib/prisma";
-import { prismaMissingTableUserHint } from "@/lib/prismaDbHelp";
+import { prismaUserFacingHttpError } from "@/lib/prismaDbHelp";
 
 export const runtime = "nodejs";
 
@@ -53,8 +53,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ slug: string }
       update: { title, content: content as object },
     });
   } catch (e) {
-    const hint = prismaMissingTableUserHint(e);
-    if (hint) return NextResponse.json({ error: hint }, { status: 503 });
+    const facing = prismaUserFacingHttpError(e);
+    if (facing) return NextResponse.json({ error: facing.error }, { status: facing.status });
     console.error(e);
     return NextResponse.json({ error: "Ошибка записи в БД" }, { status: 500 });
   }

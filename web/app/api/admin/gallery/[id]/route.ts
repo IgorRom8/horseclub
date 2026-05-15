@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { assertAdmin } from "@/lib/adminApiAuth";
 import { prisma } from "@/lib/prisma";
-import { prismaMissingTableUserHint } from "@/lib/prismaDbHelp";
+import { prismaUserFacingHttpError } from "@/lib/prismaDbHelp";
 
 export const runtime = "nodejs";
 
@@ -53,9 +53,10 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
       return NextResponse.json({ error: "Можно редактировать только галерею конюшен" }, { status: 403 });
     }
   } catch (e) {
-    const hint = prismaMissingTableUserHint(e);
-    if (hint) return NextResponse.json({ error: hint }, { status: 503 });
-    return NextResponse.json({ error: "Карточка не найдена" }, { status: 404 });
+    const facing = prismaUserFacingHttpError(e);
+    if (facing) return NextResponse.json({ error: facing.error }, { status: facing.status });
+    console.error(e);
+    return NextResponse.json({ error: "Ошибка записи в БД" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
