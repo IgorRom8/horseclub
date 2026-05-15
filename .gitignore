@@ -8,3 +8,4 @@ dist
 .env.local
 *.log
 web/generated/
+*.tsbuildinfo
