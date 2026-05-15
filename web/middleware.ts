@@ -1,12 +1,23 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { getAdminSessionSecret } from "@/lib/adminCredentials";
+import { getAdminSessionSecret, isAdminOpenAccess } from "@/lib/adminCredentials";
 import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from "@/lib/adminSession";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (!pathname.startsWith("/admin")) return NextResponse.next();
+
+  if (isAdminOpenAccess()) {
+    if (
+      pathname === "/admin" ||
+      pathname === "/admin/" ||
+      pathname.startsWith("/admin/login")
+    ) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    return NextResponse.next();
+  }
 
   const secret = getAdminSessionSecret();
 

@@ -1,10 +1,19 @@
 import Link from "next/link";
 
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
+import { isAdminOpenAccess } from "@/lib/adminCredentials";
 
-export default function AdminPrivateLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminPrivateLayout({ children }: { children: React.ReactNode }) {
+  const open = isAdminOpenAccess();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#faf8f5] to-sand/30">
+      {open ? (
+        <div className="border-b border-amber-200/90 bg-amber-50 px-4 py-2.5 text-center text-xs leading-relaxed text-amber-950">
+          Панель открыта для всех (сайт не в продакшене). Перед запуском в прод защитите:{" "}
+          <code className="rounded bg-white/90 px-1 py-0.5">ADMIN_OPEN_ACCESS=false</code> и вход по паролю.
+        </div>
+      ) : null}
       <header className="sticky top-0 z-10 border-b border-sand/90 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-3 px-4 py-3">
           <span className="font-serif text-lg font-semibold text-accent">Админ-сайт</span>
@@ -26,7 +35,11 @@ export default function AdminPrivateLayout({ children }: { children: React.React
             </Link>
           </nav>
           <div className="ml-auto">
-            <AdminLogoutButton />
+            {open ? (
+              <span className="text-xs font-medium text-neutral-500">Без пароля</span>
+            ) : (
+              <AdminLogoutButton />
+            )}
           </div>
         </div>
       </header>

@@ -1,13 +1,14 @@
-import { getAdminSessionSecret } from "@/lib/adminCredentials";
+import { getAdminSessionSecret, isAdminOpenAccess } from "@/lib/adminCredentials";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
   const hasDb = Boolean(process.env.DATABASE_URL?.trim());
   const sessionConfigured = getAdminSessionSecret() !== null;
+  const open = isAdminOpenAccess();
 
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl text-accent">Панель</h1>
-      {!sessionConfigured ? (
+      {!open && !sessionConfigured ? (
         <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
           Задайте <code>ADMIN_SESSION_SECRET</code> в окружении (обязателен в production). Локально в development
           используется встроенный секрет.
@@ -15,8 +16,8 @@ export default function AdminDashboardPage() {
       ) : null}
       {!hasDb ? (
         <p className="rounded-lg border border-sand bg-white p-4 text-sm text-neutral-700">
-          Без <code className="text-xs">DATABASE_URL</code> сохранение текстов и картинок недоступно. Форма входа
-          работает; главная и внутренние страницы по умолчанию берут данные из кода.
+          Без <code className="text-xs">DATABASE_URL</code> сохранение текстов и картинок недоступно. Главная и
+          внутренние страницы по умолчанию берут данные из кода.
         </p>
       ) : (
         <p className="text-sm text-neutral-600">
@@ -30,7 +31,7 @@ export default function AdminDashboardPage() {
           <strong>Главная</strong> — тексты блоков и URL основных изображений (герой, услуги, инфраструктура).
         </li>
         <li>
-          <strong>Страницы</strong> — JSON-контент для «Инфраструктура», «О нас», «Правила».
+          <strong>Страницы</strong> — редактор блоков для «Инфраструктура», «О нас», «Правила».
         </li>
         <li>
           <strong>Конюшни</strong> — три карточки: заголовок, описания, ссылки на фото (можно загрузить файл).

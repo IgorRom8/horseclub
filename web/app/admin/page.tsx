@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AdminLoginForm } from "./login/AdminLoginForm";
-import { getAdminSessionSecret } from "@/lib/adminCredentials";
+import { getAdminSessionSecret, isAdminOpenAccess } from "@/lib/adminCredentials";
 import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from "@/lib/adminSession";
 
 export default async function AdminLoginEntryPage({
@@ -10,6 +10,10 @@ export default async function AdminLoginEntryPage({
 }: {
   searchParams: Promise<{ err?: string }>;
 }) {
+  if (isAdminOpenAccess()) {
+    redirect("/admin/dashboard");
+  }
+
   const { err } = await searchParams;
   const secret = getAdminSessionSecret();
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
