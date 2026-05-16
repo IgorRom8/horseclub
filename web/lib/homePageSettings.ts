@@ -1,3 +1,5 @@
+import "@/lib/ensureDatabaseUrl";
+
 import { prisma } from "@/lib/prisma";
 import { siteImages } from "@/lib/siteImages";
 
