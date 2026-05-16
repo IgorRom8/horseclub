@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma-client";
 
 const SCHEMA_HINT =
-  "В PostgreSQL нет актуальной схемы. В каталоге проекта выполните: npm run db:push (или из web: npx prisma db push).";
+  "В базе Neon нет таблиц проекта. На своём ПК в web/.env.local укажите тот же DATABASE_URL, что в Vercel; из корня репозитория выполните: npm run db:push и при необходимости npm run db:seed. Затем снова сохраните в админке.";
 
 const DB_CONNECT_HINT =
   "Не удаётся подключиться к базе. Проверьте DATABASE_URL в настройках Vercel, что база доступна извне и что в строке подключения для облачного PostgreSQL указан SSL (часто нужно добавить ?sslmode=require).";
