@@ -26,11 +26,11 @@
 
     "images:placeholders": "node scripts/write-svg-placeholders.mjs",
 
-    "db:generate": "dotenv -e .env.local -- prisma generate",
+    "db:generate": "dotenv -o -e .env.local -- prisma generate",
 
-    "db:push": "dotenv -e .env.local -- prisma db push",
+    "db:push": "dotenv -o -e .env.local -- prisma db push",
 
-    "db:seed": "dotenv -e .env.local -- prisma db seed"
+    "db:seed": "dotenv -o -e .env.local -- prisma db seed"
 
   },
 
