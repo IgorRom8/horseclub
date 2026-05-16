@@ -62,8 +62,7 @@ export async function getResolvedHomeContent(): Promise<{ images: ResolvedSiteIm
         try {
           const parsed = JSON.parse(r.value) as Partial<HomeTexts>;
           for (const k of Object.keys(defaultHomeTexts) as (keyof HomeTexts)[]) {
-            const v = parsed[k]?.trim();
-            if (v) texts[k] = v;
+            if (typeof parsed[k] === "string") texts[k] = parsed[k];
           }
         } catch {
           /* невалидный JSON */

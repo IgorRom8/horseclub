@@ -6,6 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { ServiceTeaser } from "@/components/ServiceTeaser";
 
+/** Иначе главная может закешироваться на build / Full Route Cache и не подхватывать правки из админки. */
+export const dynamic = "force-dynamic";
+
 const city = process.env.NEXT_PUBLIC_CLUB_CITY ?? "Подмосковье";
 
 export default async function HomePage() {
