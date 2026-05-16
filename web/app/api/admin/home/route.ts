@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { assertAdmin } from "@/lib/adminApiAuth";
+import { ensureDatabaseUrlFromIntegrations } from "@/lib/ensureDatabaseUrl";
 import {
   defaultHomeTexts,
   homePageSettingKeys,
@@ -14,13 +15,20 @@ import { siteImages } from "@/lib/siteImages";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+  ensureDatabaseUrlFromIntegrations();
   const auth = await assertAdmin();
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ error: "Нужен DATABASE_URL" }, { status: 503 });
+    return NextResponse.json(
+      {
+        error:
+          "Нет подключения к БД: задайте в Vercel переменную DATABASE_URL или DATA_BASE_POSTGRES_URL (URI из Neon), включите Production и Preview, затем Redeploy.",
+      },
+      { status: 503 },
+    );
   }
 
   let body: { site_images?: Partial<ResolvedSiteImages>; home_texts?: Partial<HomeTexts> };

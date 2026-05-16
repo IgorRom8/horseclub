@@ -1,3 +1,4 @@
 export async function register() {
-  await import("./lib/ensureDatabaseUrl");
+  const { ensureDatabaseUrlFromIntegrations } = await import("./lib/ensureDatabaseUrl");
+  ensureDatabaseUrlFromIntegrations();
 }

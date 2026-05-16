@@ -1,4 +1,6 @@
-import "@/lib/ensureDatabaseUrl";
+import { ensureDatabaseUrlFromIntegrations } from "@/lib/ensureDatabaseUrl";
+
+ensureDatabaseUrlFromIntegrations();
 
 import { prisma } from "@/lib/prisma";
 import { siteImages } from "@/lib/siteImages";

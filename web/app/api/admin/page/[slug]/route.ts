@@ -2,19 +2,27 @@ import { NextResponse } from "next/server";
 
 import { assertAdmin } from "@/lib/adminApiAuth";
 import { isAdminEditableSlug } from "@/lib/adminEditablePages";
+import { ensureDatabaseUrlFromIntegrations } from "@/lib/ensureDatabaseUrl";
 import { prisma } from "@/lib/prisma";
 import { prismaUserFacingHttpError } from "@/lib/prismaDbHelp";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request, ctx: { params: Promise<{ slug: string }> }) {
+  ensureDatabaseUrlFromIntegrations();
   const auth = await assertAdmin();
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ error: "Нужен DATABASE_URL" }, { status: 503 });
+    return NextResponse.json(
+      {
+        error:
+          "Нет подключения к БД: задайте в Vercel DATABASE_URL или DATA_BASE_POSTGRES_URL, затем Redeploy.",
+      },
+      { status: 503 },
+    );
   }
 
   const { slug } = await ctx.params;

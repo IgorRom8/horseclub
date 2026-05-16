@@ -1,5 +1,7 @@
 import { getAdminSessionSecret, isAdminOpenAccess } from "@/lib/adminCredentials";
-import "@/lib/ensureDatabaseUrl";
+import { ensureDatabaseUrlFromIntegrations } from "@/lib/ensureDatabaseUrl";
+
+ensureDatabaseUrlFromIntegrations();
 
 export default async function AdminDashboardPage() {
   const hasDb = Boolean(process.env.DATABASE_URL?.trim());
