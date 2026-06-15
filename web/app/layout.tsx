@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
@@ -30,9 +31,11 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${sans.variable} ${serif.variable}`}>
       <body className="flex min-h-screen flex-col font-sans">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

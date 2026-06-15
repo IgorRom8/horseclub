@@ -2,6 +2,9 @@
 
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { useAuth } from "@/components/auth/AuthProvider";
+import { addLocalLead } from "@/lib/localLeads";
 export type LeadFormProps = {
   /** Запись по конкретной услуге */
   serviceSlug?: "postoy" | "trenirovki" | "kormlenie";
@@ -28,6 +31,7 @@ export function LeadForm({
   className,
   onSuccess,
 }: LeadFormProps) {
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
@@ -99,6 +103,17 @@ export function LeadForm({
       if (!res.ok) {
         throw new Error(data.error ?? `Ошибка ${res.status}`);
       }
+      if (user) {
+        addLocalLead({
+          userId: user.userId,
+          name: n,
+          phone: p,
+          message: message.trim() || undefined,
+          serviceSlug: serviceSlug ?? undefined,
+          serviceTitle: serviceTitle ?? undefined,
+          preferredDate: preferredDate || undefined,
+        });
+      }
       setStatus("ok");
       setName("");
       setPhone("");
@@ -108,7 +123,7 @@ export function LeadForm({
       setStatus("err");
       setErrText(e instanceof Error ? e.message : "Не удалось отправить");
     }
-  }, [name, phone, message, preferredDate, needDate, serviceSlug]);
+  }, [name, phone, message, preferredDate, needDate, serviceSlug, serviceTitle, user]);
   return (
     <div className={className}>
       {serviceTitle ? (
@@ -204,6 +219,15 @@ export function LeadForm({
                 </h2>
                 <p id="lead-success-desc" className="mt-3 text-sm leading-relaxed text-neutral-700">
                   Вам скоро перезвонит менеджер.
+                  {user ? (
+                    <>
+                      {" "}
+                      <a href="/account" className="font-medium text-accent underline-offset-2 hover:underline">
+                        Смотреть в личном кабинете
+                      </a>
+                      .
+                    </>
+                  ) : null}
                 </p>
                 <button
                   type="button"

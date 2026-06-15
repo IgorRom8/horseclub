@@ -127,7 +127,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl border-t border-sand/70 px-4 py-16 md:py-20">
+      <section className="mx-auto max-w-6xl border-t border-sand/70 px-4 py-16 md:py-20" id="lead">
         <FadeIn>
           <h2 className="font-serif text-3xl font-semibold tracking-tight text-accent md:text-4xl">{t.leadTitle}</h2>
           <p className="mt-3 max-w-2xl leading-relaxed text-neutral-700">{t.leadIntro}</p>

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
+
 const links = [
   { href: "/uslugi", label: "Услуги" },
   { href: "/infrastruktura", label: "Инфраструктура" },
@@ -21,9 +23,59 @@ const desktopLinkClass =
 const mobileLinkClass =
   "block rounded-xl border border-transparent px-3 py-3 text-base font-medium text-neutral-700 transition-colors hover:border-sand/80 hover:bg-sand/40 hover:text-accent active:bg-sand/55";
 
+function AuthLinks({ mobile }: { mobile?: boolean }) {
+  const { user, ready, logout } = useAuth();
+  const pathname = usePathname();
+
+  if (!ready) return null;
+
+  const linkClass = mobile
+    ? mobileLinkClass
+    : "text-sm font-medium text-neutral-600 transition hover:text-accent";
+
+  if (user) {
+    return (
+      <>
+        <Link href="/account" className={linkClass}>
+          {user.username}
+        </Link>
+        <button
+          type="button"
+          className={mobile ? mobileLinkClass + " w-full text-left" : linkClass}
+          onClick={() => {
+            logout();
+            if (pathname === "/account") window.location.href = "/";
+          }}
+        >
+          Выйти
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Link href="/login" className={linkClass}>
+        Вход
+      </Link>
+      <Link
+        href="/register"
+        className={
+          mobile
+            ? mobileLinkClass
+            : "rounded-full bg-accent px-3 py-1.5 text-sm font-semibold text-white hover:bg-accent-dark"
+        }
+      >
+        Регистрация
+      </Link>
+    </>
+  );
+}
+
 export function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const hideAuth = pathname.startsWith("/admin");
 
   useEffect(() => {
     setOpen(false);
@@ -54,12 +106,17 @@ export function Header() {
           Конный клуб
         </Link>
 
-        <nav className="hidden flex-wrap gap-x-5 gap-y-2 md:flex" aria-label="Основное меню">
+        <nav className="hidden flex-wrap items-center gap-x-5 gap-y-2 md:flex" aria-label="Основное меню">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className={desktopLinkClass}>
               {l.label}
             </Link>
           ))}
+          {!hideAuth ? (
+            <div className="ml-1 flex items-center gap-3 border-l border-sand/80 pl-4">
+              <AuthLinks />
+            </div>
+          ) : null}
         </nav>
 
         <button
@@ -103,6 +160,13 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              {!hideAuth ? (
+                <li className="mt-2 border-t border-sand/70 pt-2">
+                  <div className="flex flex-col gap-1">
+                    <AuthLinks mobile />
+                  </div>
+                </li>
+              ) : null}
             </ul>
           </nav>
         </>
