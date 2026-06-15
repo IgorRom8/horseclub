@@ -21,6 +21,10 @@ const serif = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "Конный клуб",
   description: "Постой, тренировки, инфраструктура, правила конной базы.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
 
   transpilePackages: ["yet-another-react-lightbox"],
 
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: "/favicon.svg" }];
+  },
+
   images: {
 
     /** Локальные файлы из `public/images`. */
