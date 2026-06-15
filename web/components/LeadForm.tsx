@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -222,9 +223,9 @@ export function LeadForm({
                   {user ? (
                     <>
                       {" "}
-                      <a href="/account" className="font-medium text-accent underline-offset-2 hover:underline">
+                      <Link href="/account" className="font-medium text-accent underline-offset-2 hover:underline">
                         Смотреть в личном кабинете
-                      </a>
+                      </Link>
                       .
                     </>
                   ) : null}
